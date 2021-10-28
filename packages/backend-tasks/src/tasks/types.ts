@@ -38,6 +38,11 @@ export type TaskFunction =
 export interface TaskDefinition {
   /**
    * A unique ID (within the scope of the plugin) for the task.
+   *
+   * @remarks
+   *
+   * IDs must be lowercase a-z and digits, separated by underscores. This
+   * ensures that they are compatible with a wide range of systems.
    */
   id: string;
 
@@ -92,11 +97,11 @@ export interface TaskDefinition {
 }
 
 /**
- * Deals with the scheduling of distributed tasks, for a given plugin.
+ * Deals with the scheduling of distributed tasks.
  *
  * @public
  */
-export interface PluginTaskScheduler {
+export interface TaskScheduler {
   /**
    * Schedules a task function for coordinated exclusive invocation across
    * workers.
@@ -105,7 +110,7 @@ export interface PluginTaskScheduler {
    * its options are just overwritten with the given options, and things
    * continue from there.
    *
-   * @param definition - The task definition
+   * @param task - The task definition
    */
   scheduleTask(task: TaskDefinition): Promise<void>;
 }

@@ -15,10 +15,10 @@ yarn add @backstage/backend-tasks
 then make use of its facilities as necessary:
 
 ```typescript
-import { TaskScheduler } from '@backstage/backend-tasks';
+import { TaskSchedulers } from '@backstage/backend-tasks';
 import { Duration } from 'luxon';
 
-const scheduler = TaskScheduler.fromConfig(rootConfig).forPlugin('my-plugin');
+const scheduler = TaskSchedulers.fromConfig(rootConfig).forPlugin('my-plugin');
 
 await scheduler.scheduleTask({
   id: 'refresh-things',

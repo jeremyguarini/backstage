@@ -19,9 +19,9 @@ import { TestDatabaseId, TestDatabases } from '@backstage/backend-test-utils';
 import { Duration } from 'luxon';
 import waitForExpect from 'wait-for-expect';
 import { migrateBackendTasks } from '../database/migrateBackendTasks';
-import { PluginTaskSchedulerImpl } from './PluginTaskSchedulerImpl';
+import { TaskSchedulerImpl } from './TaskSchedulerImpl';
 
-describe('PluginTaskManagerImpl', () => {
+describe('TaskSchedulerImpl', () => {
   const databases = TestDatabases.create({
     ids: ['POSTGRES_13', 'POSTGRES_9', 'SQLITE_3'],
   });
@@ -29,10 +29,7 @@ describe('PluginTaskManagerImpl', () => {
   async function init(databaseId: TestDatabaseId) {
     const knex = await databases.init(databaseId);
     await migrateBackendTasks(knex);
-    const manager = new PluginTaskSchedulerImpl(
-      async () => knex,
-      getVoidLogger(),
-    );
+    const manager = new TaskSchedulerImpl(async () => knex, getVoidLogger());
     return { knex, manager };
   }
 

@@ -16,11 +16,12 @@
 
 import { DatabaseManager, getVoidLogger } from '@backstage/backend-common';
 import { TestDatabaseId, TestDatabases } from '@backstage/backend-test-utils';
+import { ConfigReader } from '@backstage/config';
 import { Duration } from 'luxon';
-import { TaskScheduler } from './TaskScheduler';
 import waitForExpect from 'wait-for-expect';
+import { TaskSchedulers } from './TaskSchedulers';
 
-describe('TaskScheduler', () => {
+describe('TaskSchedulers', () => {
   const logger = getVoidLogger();
   const databases = TestDatabases.create({
     ids: ['POSTGRES_13', 'POSTGRES_9', 'SQLITE_3'],
@@ -41,8 +42,11 @@ describe('TaskScheduler', () => {
   it.each(databases.eachSupportedId())(
     'can return a working plugin impl, %p',
     async databaseId => {
-      const database = await createDatabase(databaseId);
-      const manager = new TaskScheduler(database, logger).forPlugin('test');
+      const databaseManager = await createDatabase(databaseId);
+      const manager = TaskSchedulers.fromConfig(new ConfigReader({}), {
+        databaseManager,
+        logger,
+      }).forPlugin('test');
       const fn = jest.fn();
 
       await manager.scheduleTask({

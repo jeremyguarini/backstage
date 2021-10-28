@@ -14,9 +14,5 @@
  * limitations under the License.
  */
 
-export { TaskScheduler } from './TaskScheduler';
-export type {
-  PluginTaskScheduler,
-  TaskDefinition,
-  TaskFunction,
-} from './types';
+export { TaskSchedulers } from './TaskSchedulers';
+export type { TaskScheduler, TaskDefinition, TaskFunction } from './types';

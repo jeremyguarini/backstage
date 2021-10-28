@@ -25,7 +25,7 @@ import { sleep } from './util';
  * Makes sure to auto-expire and clean up things that time out or for other
  * reasons should not be left lingering.
  */
-export class PluginTaskSchedulerJanitor {
+export class TaskSchedulerJanitor {
   private readonly knex: Knex;
   private readonly waitBetweenRuns: Duration;
   private readonly logger: Logger;

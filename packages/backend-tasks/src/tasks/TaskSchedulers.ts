@@ -20,29 +20,29 @@ import { memoize } from 'lodash';
 import { Duration } from 'luxon';
 import { Logger } from 'winston';
 import { migrateBackendTasks } from '../database/migrateBackendTasks';
-import { PluginTaskSchedulerImpl } from './PluginTaskSchedulerImpl';
-import { PluginTaskSchedulerJanitor } from './PluginTaskSchedulerJanitor';
-import { PluginTaskScheduler } from './types';
+import { TaskSchedulerImpl } from './TaskSchedulerImpl';
+import { TaskSchedulerJanitor } from './TaskSchedulerJanitor';
+import { TaskScheduler } from './types';
 
 /**
- * Deals with the scheduling of distributed tasks.
+ * Creates task schedulers on demand.
  *
  * @public
  */
-export class TaskScheduler {
+export class TaskSchedulers {
   static fromConfig(
     config: Config,
     options?: {
       databaseManager?: DatabaseManager;
       logger?: Logger;
     },
-  ): TaskScheduler {
+  ): TaskSchedulers {
     const databaseManager =
       options?.databaseManager ?? DatabaseManager.fromConfig(config);
     const logger = (options?.logger || getRootLogger()).child({
-      type: 'taskManager',
+      type: 'taskScheduler',
     });
-    return new TaskScheduler(databaseManager, logger);
+    return new TaskSchedulers(databaseManager, logger);
   }
 
   constructor(
@@ -54,15 +54,15 @@ export class TaskScheduler {
    * Instantiates a task manager instance for the given plugin.
    *
    * @param pluginId - The unique ID of the plugin, for example "catalog"
-   * @returns A {@link PluginTaskScheduler} instance
+   * @returns A {@link TaskScheduler} instance
    */
-  forPlugin(pluginId: string): PluginTaskScheduler {
+  forPlugin(pluginId: string): TaskScheduler {
     const databaseFactory = memoize(async () => {
       const knex = await this.databaseManager.forPlugin(pluginId).getClient();
 
       await migrateBackendTasks(knex);
 
-      const janitor = new PluginTaskSchedulerJanitor({
+      const janitor = new TaskSchedulerJanitor({
         knex,
         waitBetweenRuns: Duration.fromObject({ minutes: 1 }),
         logger: this.logger,
@@ -72,7 +72,7 @@ export class TaskScheduler {
       return knex;
     });
 
-    return new PluginTaskSchedulerImpl(
+    return new TaskSchedulerImpl(
       databaseFactory,
       this.logger.child({ plugin: pluginId }),
     );

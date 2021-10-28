@@ -10,11 +10,6 @@ import { Duration } from 'luxon';
 import { Logger as Logger_2 } from 'winston';
 
 // @public
-export interface PluginTaskScheduler {
-  scheduleTask(task: TaskDefinition): Promise<void>;
-}
-
-// @public
 export interface TaskDefinition {
   fn: TaskFunction;
   frequency: Duration;
@@ -30,9 +25,14 @@ export type TaskFunction =
   | (() => void | Promise<void>);
 
 // @public
-export class TaskScheduler {
+export interface TaskScheduler {
+  scheduleTask(task: TaskDefinition): Promise<void>;
+}
+
+// @public
+export class TaskSchedulers {
   constructor(databaseManager: DatabaseManager, logger: Logger_2);
-  forPlugin(pluginId: string): PluginTaskScheduler;
+  forPlugin(pluginId: string): TaskScheduler;
   // (undocumented)
   static fromConfig(
     config: Config,
@@ -40,6 +40,6 @@ export class TaskScheduler {
       databaseManager?: DatabaseManager;
       logger?: Logger_2;
     },
-  ): TaskScheduler;
+  ): TaskSchedulers;
 }
 ```
